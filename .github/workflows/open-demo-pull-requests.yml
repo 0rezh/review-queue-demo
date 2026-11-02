@@ -1,0 +1,27 @@
+name: Open demo pull requests
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-pull-requests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Open one pull request per demo branch, with a review requested from the owner
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          REVIEWER: ${{ github.repository_owner }}
+        run: |
+          open_pull_request() {
+            gh pr create --base main --head "$1" --title "$2" --body "$3" --reviewer "$REVIEWER"
+          }
+          open_pull_request feat/french-greeting "feat: add French greeting" "Adds a French variant of the greeting helper."
+          open_pull_request feat/relative-time "feat: add relative time helper" "Adds a helper that describes how long ago a date was."
+          open_pull_request docs/readme-wording "docs: clarify readme wording" "Rewords the first sentence of the README."
